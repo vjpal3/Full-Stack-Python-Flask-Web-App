@@ -236,7 +236,61 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    user_id = session["user_id"]
+
+    # User reached here after posting form data
+    if request.method == "POST":
+        selectedSymbol = request.form.get("symbol")
+        shares = request.form.get("shares")
+
+        if not selectedSymbol:
+            return apology("Missing symbol", 400)
+        elif not shares:
+            return apology("Please enter number of Shares", 400)
+
+        try:
+            shares = int(shares)
+            if shares < 0:
+               return apology("Please enter positive number of Shares", 400)
+        except ValueError:
+            return apology("Please enter positive number of Shares", 400)
+
+        # Check if the user has that many shares to sell
+        usersShares = db.execute("SELECT SUM(shares) as no_of_shares from portfolio where user_id = ? and symbol = ? GROUP BY symbol", user_id, selectedSymbol)
+        if usersShares[0]["no_of_shares"] < shares:
+            return apology("Sorry! Too many shares")
+
+        stockData = lookup(selectedSymbol)
+        totalPrice = shares * stockData["price"]
+
+        # Enter the sale tranction into user's portfolio, the sold shares as negative value
+        shares *= -1
+        sql = "INSERT INTO portfolio (user_id, symbol, price, shares) values( ?, ?, ?, ?)"
+        db_insert = db.execute(sql, (user_id, stockData["symbol"], stockData["price"], shares ))
+        if not db_insert:
+            return apology("Database error", 404)
+
+        cashData = db.execute("SELECT cash FROM users WHERE id = ?", (user_id))
+        if not cashData:
+           return apology("Database error", 404)
+
+        cash = cashData[0]["cash"]
+
+        # Update user's cash
+        db_update = db.execute("UPDATE users set cash = ? WHERE id = ?", (cash + totalPrice, user_id))
+        if not db_update:
+            return apology("Database error", 404)
+
+        flash("Sold!")
+        return redirect("/")
+
+    else:
+        symbolsData = db.execute("SELECT symbol from portfolio where user_id = ? GROUP BY symbol", user_id)
+        symbols = []
+        for symbol in symbolsData:
+            symbols.append(symbol["symbol"])
+
+        return render_template("sell.html", symbols=symbols)
 
 
 def errorhandler(e):

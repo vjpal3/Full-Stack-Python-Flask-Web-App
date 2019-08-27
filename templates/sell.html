@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+    <form action="/sell" method="post">
+        <div class="form-group">
+            <select autocomplete="off" class="form-control" name="symbol">
+            <option disabled selected value="">Symbol</option>
+            {% for symbol in symbols %}
+                <option value="{{ symbol }}">{{ symbol }}</option>
+            {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="shares" placeholder="Shares" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Sell</button>
+    </form>
+{% endblock %}
+
+
+<select class="form-control w-25" name="role" id="role">
+            <option disabled selected value="">Role</option>
+            <option value="Organizer">Organizer</option>
+            <option value="Volunteer">Volunteer</option>
+            <option value="Participant">Participant</option>
+            <option value="Counselor">Counselor</option>
+          </select>
