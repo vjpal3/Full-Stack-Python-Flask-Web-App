@@ -51,7 +51,58 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        shares = request.form.get("shares")
+
+        if not symbol:
+            return apology("Please enter Symbol", 403)
+        elif not shares:
+            return apology("Please enter number of Shares", 403)
+
+        try:
+            shares = int(shares)
+            if shares < 0:
+               return apology("Please enter positive number of Shares", 403)
+
+        except ValueError:
+            return apology("Please enter positive number of Shares", 403)
+
+        # Get stock's information from api
+        result = lookup(symbol)
+        # Check if symbol is valid
+        if not result:
+            return apology("Invalid Symbol", 400)
+
+        user_id = session["user_id"]
+        rows = db.execute("SELECT cash FROM users WHERE id = ?", (user_id))
+        if not rows:
+           return apology("Database error", 404)
+
+        cash = rows[0]["cash"]
+
+        totalPrice = shares * result["price"]
+        if cash < totalPrice:
+            return apology("Sorry! your acccount dosen't have enough cash", 400)
+
+        # Insert data into user's portfolio
+        sql = "INSERT INTO portfolio (user_id, symbol, price, shares) values( ?, ?, ?, ?)"
+        db_insert = db.execute(sql, (user_id, result["symbol"], result["price"], shares ))
+        if not db_insert:
+            return apology("Database error", 404)
+
+        # Update user's cash
+        db_update = db.execute("UPDATE users set cash = ? WHERE id = ?", (cash - totalPrice, user_id))
+        if not db_update:
+            return apology("Database error", 404)
+
+        flash("Bought!")
+        return redirect("/")
+
+    # User reached route via GET
+    else:
+        return render_template("buy.html")
 
 
 @app.route("/check", methods=["GET"])
