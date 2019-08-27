@@ -5,8 +5,6 @@
 {% endblock %}
 
 {% block main %}
-
-        {% set total=10000 %}
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -25,7 +23,9 @@
                     <td>{{ stock["shares"] }}</td>
                     <td>{{ stock["price"] | usd }}</td>
 
-                    <td>{{ (stock["price"] * stock["shares"]) | usd }}</td>
+                    {% set stockTotal = stock["price"] * stock["shares"] %}
+
+                    <td>{{ stockTotal | usd }}</td>
                 </tr>
                 {% endfor %}
                 <tr>
@@ -40,7 +40,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td>{{ total | usd  }}</td>
+                    <td>{{ grandTotal | usd  }}</td>
                 </tr>
             </tbody>
         </table>

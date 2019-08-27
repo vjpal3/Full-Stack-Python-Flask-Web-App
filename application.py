@@ -54,9 +54,14 @@ def index():
         stockData["shares"] = row["no_of_shares"]
         stocks.append(stockData)
 
+        # Add the total value of each holding
+        grandTotal += stockData["price"] * stockData["shares"]
+
     # Get user's available cash
     cash = db.execute("Select cash from users where id = ?", user_id)
-    return render_template("index.html", stocks=stocks, cash=cash[0]["cash"] )
+    # Add to the total, the available cash user has
+    grandTotal += cash[0]["cash"]
+    return render_template("index.html", stocks=stocks, cash=cash[0]["cash"], grandTotal=grandTotal)
 
 
 @app.route("/buy", methods=["GET", "POST"])
