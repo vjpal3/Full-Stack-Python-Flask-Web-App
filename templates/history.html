@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    {% if not transactions %}
+        <h4> No transaction history available for this account! </h4>
+
+    {% else %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">Shares</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Transacted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction["symbol"] }}</td>
+                    <td>{{ transaction["shares"] }}</td>
+                    <td>{{ transaction["price"] | usd }}</td>
+                    <td>{{ transaction["transacted"] }}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
