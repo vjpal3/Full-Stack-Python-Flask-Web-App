@@ -18,10 +18,10 @@
 
                 if($.trim(uname) !== "") {
                     $.get("/check?username=" + uname, function(result) {
-                        if(result == "false"){
+                        if(!result) {
                            showAlert('Oops!! Username already taken. Please choose another one.')
                         }
-                        else if(result ==  "true") {
+                        else {
                             $("#registration-form").off('submit').submit();
                          }
                     });

@@ -134,9 +134,9 @@ def check():
     result = db.execute("SELECT username FROM users WHERE username = :username", username=username)
 
     if not result:
-        return jsonify("true")
+        return jsonify(True)
 
-    return jsonify("false")
+    return jsonify(False)
 
 
 @app.route("/history")
