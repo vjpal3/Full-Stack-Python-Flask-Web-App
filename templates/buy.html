@@ -6,9 +6,13 @@
 
 {% block main %}
     <form action="/buy" method="post">
-        <div class="form-group">
+
+        {% if not symbol %}
             <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Symbol" type="text">
-        </div>
+        {% else %}
+            <input autocomplete="off" value="{{symbol}}" class="form-control" name="symbol" type="text">
+        {% endif %}
+        
         <div class="form-group">
             <input class="form-control" name="shares" placeholder="Shares" type="text">
         </div>

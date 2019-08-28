@@ -117,9 +117,10 @@ def buy():
         flash("Bought!")
         return redirect("/")
 
-    # User reached route via GET
+    # user selected the link to buy shares of a perticular company on home page
     else:
-        return render_template("buy.html")
+        symbol = request.args.get("symbol")
+        return render_template("buy.html", symbol=symbol)
 
 
 @app.route("/check", methods=["GET"])
@@ -302,11 +303,17 @@ def sell():
         return redirect("/")
 
     else:
-        symbolsData = db.execute("SELECT symbol from portfolio where user_id = ? GROUP BY symbol", user_id)
+        symbolParam = request.args.get("symbol")
         symbols = []
-        for symbol in symbolsData:
-            symbols.append(symbol["symbol"])
 
+        if not symbolParam:
+            symbolsData = db.execute("SELECT symbol from portfolio where user_id = ? GROUP BY symbol", user_id)            
+            for symbol in symbolsData:
+                symbols.append(symbol["symbol"])
+
+        # user selected the link to sell shares of a perticular company on home page
+        else:
+            symbols.append(symbolParam)
         return render_template("sell.html", symbols=symbols)
 
 

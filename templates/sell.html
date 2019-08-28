@@ -8,7 +8,10 @@
     <form action="/sell" method="post">
         <div class="form-group">
             <select autocomplete="off" class="form-control" name="symbol">
-            <option disabled selected value="">Symbol</option>
+            {% if symbols | length  > 1 %}
+                <option disabled selected value="">Symbol</option>
+            {% endif %}
+            
             {% for symbol in symbols %}
                 <option value="{{ symbol }}">{{ symbol }}</option>
             {% endfor %}
