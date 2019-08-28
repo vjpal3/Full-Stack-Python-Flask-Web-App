@@ -1,13 +1,48 @@
 {% extends "layout.html" %}
 
+{% block script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#errorAlert").removeClass("alert-warning border text-center");
+            $("#errorAlert").html("");
+
+            function showAlert(msg) {
+                $("#errorAlert").addClass("alert-warning border text-center");
+                $("#errorAlert").html(msg);
+                $("#errorAlert").removeClass('hide');
+                // $("#errorAlert").hide().slideDown(400).removeClass('hide');
+            }
+            $("#registration-form").on('submit', function(e) {
+                e.preventDefault();
+                var uname = $("#uname").val();
+
+                if($.trim(uname) !== "") {
+                    $.get("/check?username=" + uname, function(result) {
+                        if(result == "false"){
+                           showAlert('Oops!! Username already taken. Please choose another one.')
+                        }
+                        else if(result ==  "true") {
+                            $("#registration-form").off('submit').submit();
+                         }
+                    });
+                } //if($.trim(uname) !== "")
+                else {
+                    showAlert('Oops!! Username cannot be blank.');
+                }
+            }); //on(submit)
+        });
+    </script>
+{% endblock %}
+
 {% block title %}
     Register
 {% endblock %}
 
 {% block main %}
-    <form action="/register" method="post">
+    <div class="alert hide" id="errorAlert"></div>
+    <form action="/register" method="post" id="registration-form">
         <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+            <input autocomplete="off" autofocus class="form-control" id="uname" name="username" placeholder="Username" type="text">
         </div>
         <div class="form-group">
             <input class="form-control" name="password" placeholder="Password" type="password">
